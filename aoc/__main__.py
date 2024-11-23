@@ -1,30 +1,20 @@
 import sys
-import time
 import pathlib
-
-from . import DAYS
+import importlib
 
 _INPUTS = pathlib.Path(__file__).parents[1] / "inputs"
 
 
-def run(day, solver, solutions):
-    start = time.perf_counter()
-    with open(_INPUTS / day) as f:
-        data = f.read()
-    results = solver.run(data)
-    end = time.perf_counter()
-
-    print()
-    for idx, result in enumerate(results):
-        print(f"[{day}/{idx+1}] {result}")
-    print(f"{1000 * (end - start):.3f}ms")
-    assert results == solutions
+def run(day: int) -> None:
+    solver = importlib.import_module(f".day{day:02}", package="aoc")
+    data = (_INPUTS / f"{day:02}").read_text()
+    solver.run(data)
 
 
-if len(sys.argv) > 1:
-    for arg in sys.argv[1:]:
-        day = f"{arg:>02}"
-        run(day, *DAYS[day])
-else:
-    for day in DAYS:
-        run(day, *DAYS[day])
+days = (
+    sorted(int(arg) for arg in sys.argv[1:])
+    if len(sys.argv) > 1
+    else list(range(1, 26))
+)
+for day in days:
+    run(day)
