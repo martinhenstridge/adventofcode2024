@@ -1,4 +1,11 @@
+# avoid committing inputs
+/inputs
+
+# python ignores
+/.venv/
 __pycache__/
 *.py[cod]
-.venv
-/inputs
+
+# zig ignores
+/main
+*.o

@@ -1,9 +1,23 @@
-# adventofcode2024
+# Advent of Code 2024
+
+## Python
 
 Run solutions as follows:
 
 ```
-python3 -m aoc [DAY]
+python3 -m aoc [DAY]...
 ```
 
-Omit the `DAY` argument altogether to run all solutions sequentially, or specify `DAY` as a two-digit number (e.g. `01`) to run only the solution for that day's problem.
+## Zig
+
+Build as follows:
+
+```
+zig build-exe main.zig
+```
+
+Run solutions as follows:
+
+```
+./main [DAY]...
+```

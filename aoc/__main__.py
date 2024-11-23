@@ -22,8 +22,9 @@ def run(day, solver, solutions):
 
 
 if len(sys.argv) > 1:
-    day = sys.argv[1]
-    run(day, *DAYS[day])
+    for arg in sys.argv[1:]:
+        day = f"{arg:>02}"
+        run(day, *DAYS[day])
 else:
     for day in DAYS:
         run(day, *DAYS[day])
