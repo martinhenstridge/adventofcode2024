@@ -7,7 +7,7 @@ const Day = struct {
 
 const days = [_]Day{
     .{
-        .solver = @import("zig/day00.zig").main,
+        .solver = @import("zigaoc/day00.zig").main,
         .input = @embedFile("inputs/00"),
     },
 };
