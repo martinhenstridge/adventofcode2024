@@ -1,11 +1,9 @@
 const std = @import("std");
 
-
 const Day = struct {
     solver: fn ([]const u8) void,
     input: []const u8,
 };
-
 
 const days = [_]Day{
     .{
@@ -13,7 +11,6 @@ const days = [_]Day{
         .input = @embedFile("inputs/00"),
     },
 };
-
 
 pub fn main() !void {
     var should_run = [_]bool{false} ** days.len;

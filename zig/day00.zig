@@ -1,6 +1,5 @@
 const std = @import("std");
 
-
 pub fn main(input: []const u8) void {
     const part1: u32 = 0;
     const part2: u32 = 0;
