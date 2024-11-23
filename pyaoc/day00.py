@@ -1,4 +1,4 @@
-def run(data):
+def run(data: str) -> None:
     print()
     print(__name__)
     print(">", None)
