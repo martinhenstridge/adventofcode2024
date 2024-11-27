@@ -1,22 +1,27 @@
-import sys
-import pathlib
 import importlib
+import pathlib
+import sys
+import time
 
 
-_ROOT = pathlib.Path(__file__).parent
+PROBLEMS = [
+    ("inputs/00", ".day00"),
+]
 
 
-if len(sys.argv) > 1:
-    days = {int(arg) for arg in sys.argv[1:]}
-else:
-    days = {
-        int(day_py.name.removesuffix(".py").removeprefix("day"))
-        for day_py in _ROOT.glob("day*.py")
-    }
+days_to_run = {int(arg) for arg in sys.argv[1:]}
 
 
-for num in sorted(days):
-    digits = f"{num:02}"
-    solver = importlib.import_module(f".day{digits}", package="pyaoc")
-    input = (_ROOT.parent / "inputs" / digits).read_text()
+for day, (input_path, solver_module) in enumerate(PROBLEMS[1:], 1):
+    if days_to_run and day not in days_to_run:
+        continue
+
+    input = pathlib.Path(input_path).read_text()
+    solver = importlib.import_module(solver_module, package="pyaoc")
+
+    print(f"Day {day:02}\n======")
+    start = time.monotonic()
     solver.run(input)
+    end = time.monotonic()
+    print(f"======\nt = {end - start}")
+    print()
