@@ -23,5 +23,5 @@ for day, (input_path, solver_module) in enumerate(PROBLEMS[1:], 1):
     start = time.monotonic()
     solver.run(input)
     end = time.monotonic()
-    print(f"======\nt = {end - start}")
+    print(f"======\nt (s) = {end - start}")
     print()

@@ -37,9 +37,10 @@ pub fn main() !void {
             const buffer = try fd.readToEndAlloc(allocator, stat.size);
             defer allocator.free(buffer);
 
-            std.debug.print("Day {}\n", .{day});
+            std.debug.print("Day {:0>2}\n======\n", .{day});
+            var timer = try std.time.Timer.start();
             problem.solver(allocator, buffer);
-            std.debug.print("\n", .{});
+            std.debug.print("======\nt (ns) = {d}\n\n", .{timer.read()});
         }
     }
 }
