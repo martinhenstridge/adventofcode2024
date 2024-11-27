@@ -5,7 +5,7 @@ import time
 
 
 PROBLEMS = [
-    ("inputs/00", ".day00"),
+    ("inputs/00", "day00"),
 ]
 
 
@@ -17,11 +17,11 @@ for day, (input_path, solver_module) in enumerate(PROBLEMS[1:], 1):
         continue
 
     input = pathlib.Path(input_path).read_text()
-    solver = importlib.import_module(solver_module, package="pyaoc")
+    solver = importlib.import_module(solver_module)
 
     print(f"Day {day:02}\n======")
-    start = time.monotonic()
+    start = time.perf_counter_ns()
     solver.run(input)
-    end = time.monotonic()
-    print(f"======\nt (s) = {end - start}")
+    end = time.perf_counter_ns()
+    print(f"======\nt (ns) = {end - start}")
     print()

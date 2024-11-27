@@ -5,7 +5,7 @@
 Run solutions as follows:
 
 ```
-python3 -m pyaoc [DAY]...
+python3 python/main.py [DAY]...
 ```
 
 ## Zig
@@ -13,7 +13,7 @@ python3 -m pyaoc [DAY]...
 Build as follows:
 
 ```
-zig build-exe zigaoc/main.zig
+zig build-exe zig/main.zig
 ```
 
 Run solutions as follows:
