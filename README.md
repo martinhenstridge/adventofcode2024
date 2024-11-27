@@ -13,11 +13,11 @@ python3 -m pyaoc [DAY]...
 Build as follows:
 
 ```
-zig build-exe aoc.zig
+zig build-exe zigaoc/main.zig
 ```
 
 Run solutions as follows:
 
 ```
-./aoc [DAY]...
+./main [DAY]...
 ```

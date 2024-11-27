@@ -1,6 +1,8 @@
 const std = @import("std");
 
-pub fn main(input: []const u8) void {
+pub fn main(allocator: std.mem.Allocator, input: []const u8) void {
+    _ = allocator;
+
     const part1: u32 = 0;
     const part2: u32 = 0;
 
@@ -9,7 +11,6 @@ pub fn main(input: []const u8) void {
         _ = line;
     }
 
-    std.debug.print("\n{s}\n", .{@src().file});
-    std.debug.print("> {}\n", .{part1});
-    std.debug.print("> {}\n", .{part2});
+    std.debug.print("{}\n", .{part1});
+    std.debug.print("{}\n", .{part2});
 }
