@@ -2,11 +2,12 @@ const std = @import("std");
 
 const Problem = struct {
     input: []const u8,
-    solver: fn (std.mem.Allocator, []const u8) void,
+    solver: fn (std.mem.Allocator, []const u8) anyerror!void,
 };
 
 const PROBLEMS = [_]Problem{
     .{ .input = "inputs/00", .solver = @import("./day00.zig").main },
+    .{ .input = "inputs/01", .solver = @import("./day01.zig").main },
 };
 
 pub fn main() !void {
@@ -39,7 +40,7 @@ pub fn main() !void {
 
             std.debug.print("Day {:0>2}\n======\n", .{day});
             var timer = try std.time.Timer.start();
-            problem.solver(allocator, buffer);
+            try problem.solver(allocator, buffer);
             std.debug.print("======\nt (ns) = {d}\n\n", .{timer.read()});
         }
     }

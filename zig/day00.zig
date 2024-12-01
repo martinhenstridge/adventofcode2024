@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub fn main(allocator: std.mem.Allocator, input: []const u8) void {
+pub fn main(allocator: std.mem.Allocator, input: []const u8) !void {
     _ = allocator;
 
     const part1: u32 = 0;
