@@ -7,6 +7,7 @@ import time
 PROBLEMS = [
     ("inputs/00", "day00"),
     ("inputs/01", "day01"),
+    ("inputs/02", "day02"),
 ]
 
 
