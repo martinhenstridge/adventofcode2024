@@ -8,6 +8,7 @@ const Problem = struct {
 const PROBLEMS = [_]Problem{
     .{ .input = "inputs/00", .solver = @import("./day00.zig").main },
     .{ .input = "inputs/01", .solver = @import("./day01.zig").main },
+    .{ .input = "inputs/02", .solver = @import("./day02.zig").main },
 };
 
 pub fn main() !void {

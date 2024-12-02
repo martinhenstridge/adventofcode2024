@@ -4,12 +4,8 @@ const ArrayList = std.ArrayList;
 const AutoHashMap = std.AutoHashMap;
 
 fn extract_lists(input: []const u8, l1: *ArrayList(i32), l2: *ArrayList(i32)) !void {
-    var line_iter = std.mem.splitScalar(u8, input, '\n');
+    var line_iter = std.mem.tokenizeScalar(u8, input, '\n');
     while (line_iter.next()) |line| {
-        if (line.len == 0) {
-            break;
-        }
-
         var val_iter = std.mem.tokenizeScalar(u8, line, ' ');
         const n1 = try std.fmt.parseInt(i32, val_iter.next().?, 10);
         const n2 = try std.fmt.parseInt(i32, val_iter.next().?, 10);
