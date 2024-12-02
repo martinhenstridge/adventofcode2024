@@ -12,6 +12,7 @@ fn extract_report(line: []const u8, report: *ArrayList(i32)) !void {
 
 fn is_safe(report: []const i32) bool {
     const sign: i32 = if (report[0] > report[1]) 1 else -1;
+
     var pairs = std.mem.window(i32, report, 2, 1);
     while (pairs.next()) |pair| {
         const diff: i32 = (pair[0] - pair[1]) * sign;
@@ -19,31 +20,26 @@ fn is_safe(report: []const i32) bool {
             return false;
         }
     }
+
     return true;
 }
 
-fn get_report_without(dst: []i32, src: []const i32, index: usize) void {
-    std.debug.assert(dst.len == src.len - 1);
-    var i: u32 = 0;
-    for (0..src.len) |j| {
-        if (j != index) {
-            dst[i] = src[j];
-            i += 1;
+fn write_damped_report(original: []const i32, omit: usize, target: *ArrayList(i32)) void {
+    target.clearRetainingCapacity();
+    for (original, 0..) |level, i| {
+        if (i != omit) {
+            target.appendAssumeCapacity(level);
         }
     }
 }
 
-fn is_safe_damped(allocator: Allocator, report: []const i32) !bool {
-    const damped = try allocator.alloc(i32, report.len - 1);
-    defer allocator.free(damped);
-
-    for (0..report.len) |i| {
-        get_report_without(damped, report, i);
-        if (is_safe(damped)) {
+fn is_safe_damped(original: []const i32, scratch: *ArrayList(i32)) bool {
+    for (0..original.len) |omit| {
+        write_damped_report(original, omit, scratch);
+        if (is_safe(scratch.items)) {
             return true;
         }
     }
-
     return false;
 }
 
@@ -51,16 +47,24 @@ pub fn main(allocator: Allocator, input: []const u8) !void {
     var safe_count_naive: u32 = 0;
     var safe_count_damped: u32 = 0;
 
+    var report = ArrayList(i32).init(allocator);
+    defer report.deinit();
+
+    var scratch = ArrayList(i32).init(allocator);
+    defer scratch.deinit();
+
     var lines = std.mem.tokenizeScalar(u8, input, '\n');
     while (lines.next()) |line| {
-        var report = ArrayList(i32).init(allocator);
-        defer report.deinit();
+        report.clearRetainingCapacity();
+        scratch.clearRetainingCapacity();
 
         try extract_report(line, &report);
+        try scratch.ensureTotalCapacity(report.items.len);
+
         if (is_safe(report.items)) {
             safe_count_naive += 1;
             safe_count_damped += 1;
-        } else if (try is_safe_damped(allocator, report.items)) {
+        } else if (is_safe_damped(report.items, &scratch)) {
             safe_count_damped += 1;
         }
     }
