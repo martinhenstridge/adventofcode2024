@@ -25,5 +25,5 @@ for day, (input_path, solver_module) in enumerate(PROBLEMS[1:], 1):
     start = time.perf_counter_ns()
     solver.run(input)
     end = time.perf_counter_ns()
-    print(f"======\nt (ns) = {end - start}")
+    print(f"======\nt (ns) = {end - start:_}")
     print()
