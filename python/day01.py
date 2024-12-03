@@ -1,4 +1,4 @@
-import collections
+from collections import defaultdict
 
 
 def extract_lists(data: str) -> tuple[list[int], list[int]]:
@@ -20,7 +20,7 @@ def run(data: str) -> None:
     l2.sort()
     total_distance = sum(abs(n1 - n2) for n1, n2 in zip(l1, l2))
 
-    similarities = collections.defaultdict(int)
+    similarities: defaultdict[int, int] = defaultdict(int)
     for n in l2:
         similarities[n] += n
     similarity_score = sum(similarities[n] for n in l1)
