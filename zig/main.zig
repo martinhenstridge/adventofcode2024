@@ -10,6 +10,7 @@ const PROBLEMS = [_]Problem{
     .{ .input = "inputs/01", .solver = @import("./day01.zig").main },
     .{ .input = "inputs/02", .solver = @import("./day02.zig").main },
     .{ .input = "inputs/03", .solver = @import("./day03.zig").main },
+    .{ .input = "inputs/04", .solver = @import("./day04.zig").main },
 };
 
 pub fn main() !void {
