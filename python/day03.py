@@ -7,13 +7,11 @@ def extract_multiplications(data: str, conditionals: bool) -> Iterator[tuple[int
     for m in re.finditer(r"do\(\)|don\'t\(\)|mul\((\d{1,3}),(\d{0,3})\)", data):
         match m.group(0):
             case "do()":
-                if conditionals:
-                    enabled = True
+                enabled = True
             case "don't()":
-                if conditionals:
-                    enabled = False
+                enabled = False
             case _:
-                if enabled:
+                if enabled or not conditionals:
                     yield int(m.group(1)), int(m.group(2))
 
 
