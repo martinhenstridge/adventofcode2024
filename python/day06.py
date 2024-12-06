@@ -1,14 +1,15 @@
-import itertools
-from collections.abc import Iterator
+Position = complex
+Heading = complex
+Grid = dict[Position, str]
 
 
-def parse_map(data: str) -> tuple[complex, dict[complex, str]]:
-    guard: complex = complex(0)
-    grid: dict[complex, str] = {}
+def parse_map(data: str) -> tuple[Position, Grid]:
+    guard = Position()
+    grid = Grid()
 
     for r, row in enumerate(data.splitlines()):
         for c, char in enumerate(row):
-            p = complex(real=r, imag=c)
+            p = Position(r, c)
             grid[p] = char
             if char == "^":
                 guard = p
@@ -16,70 +17,63 @@ def parse_map(data: str) -> tuple[complex, dict[complex, str]]:
     return guard, grid
 
 
-def heading_cycler() -> Iterator[complex]:
-    return itertools.cycle(
-        (
-            complex(real=-1, imag=0),
-            complex(real=0, imag=1),
-            complex(real=1, imag=0),
-            complex(real=0, imag=-1),
-        )
-    )
+def rotate(heading: Heading) -> Heading:
+    return Heading(heading.imag, -heading.real)
 
 
-def count_visited(guard: complex, grid: dict[complex, str]) -> int:
-    heading_iter = heading_cycler()
-    heading = next(heading_iter)
-
-    visited: set[complex] = set()
+def find_visited(guard: Position, grid: Grid) -> set[Position]:
+    visited: set[Position] = set()
+    heading = Heading(-1, 0)
 
     while True:
         visited.add(guard)
         candidate = guard + heading
 
         if candidate not in grid:
-            break
+            return visited
 
         if grid[candidate] == "#":
-            heading = next(heading_iter)
+            heading = rotate(heading)
         else:
             guard = candidate
 
-    return len(visited)
+    assert False
 
 
-def is_loop(guard: complex, grid: dict[complex, str]) -> bool:
-    heading_iter = heading_cycler()
-    heading = next(heading_iter)
-
-    history: set[tuple[complex, complex]] = set()
+def is_loop(guard: Position, grid: Grid) -> bool:
+    history: set[tuple[Position, Heading]] = set()
+    heading = Heading(-1, 0)
 
     while True:
-        if (guard, heading) in history:
+        state = (guard, heading)
+        if state in history:
             return True
 
-        history.add((guard, heading))
+        history.add(state)
         candidate = guard + heading
 
         if candidate not in grid:
             return False
 
         if grid[candidate] == "#":
-            heading = next(heading_iter)
+            heading = rotate(heading)
         else:
             guard = candidate
 
-    return False
+    assert False
 
 
 def run(data: str) -> None:
     guard, grid = parse_map(data)
 
-    visited = count_visited(guard, grid)
+    visited = find_visited(guard, grid)
 
     loops = 0
     for p in grid:
         if grid[p] != ".":
+            continue
+
+        if p not in visited:
             continue
 
         grid[p] = "#"
@@ -87,5 +81,5 @@ def run(data: str) -> None:
             loops += 1
         grid[p] = "."
 
-    print(visited)
+    print(len(visited))
     print(loops)
