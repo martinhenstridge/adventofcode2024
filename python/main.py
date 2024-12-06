@@ -29,5 +29,6 @@ for day, (input_path, solver_module) in enumerate(PROBLEMS[1:], 1):
     start = time.perf_counter_ns()
     solver.run(input)
     end = time.perf_counter_ns()
-    print(f"======\nt (ns) = {end - start:_}")
+    duration = (end - start) * 1e-9
+    print(f"======\nt (s) = {duration:.2e}")
     print()
