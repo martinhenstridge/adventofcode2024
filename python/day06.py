@@ -45,17 +45,16 @@ def is_loop(guard: Position, grid: Grid) -> bool:
     heading = Heading(-1, 0)
 
     while True:
-        state = (guard, heading)
-        if state in history:
-            return True
-
-        history.add(state)
         candidate = guard + heading
 
         if candidate not in grid:
             return False
 
         if grid[candidate] == "#":
+            state = (guard, heading)
+            if state in history:
+                return True
+            history.add(state)
             heading = rotate(heading)
         else:
             guard = candidate
