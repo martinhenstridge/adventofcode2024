@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from typing import Any
 
 
 class Page:
@@ -6,10 +7,8 @@ class Page:
         self.n = int(n)
         self.rules = rules
 
-    def __repr__(self) -> str:
-        return repr(self.n)
-
-    def __eq__(self, other: "Page") -> bool:
+    def __eq__(self, other: Any) -> bool:
+        assert isinstance(other, Page)
         return self.n == other.n
 
     def __lt__(self, other: "Page") -> bool:
