@@ -69,11 +69,8 @@ def run(data: str) -> None:
     visited = find_visited(guard, grid)
 
     loops = 0
-    for p in grid:
-        if grid[p] != ".":
-            continue
-
-        if p not in visited:
+    for p in visited:
+        if p == guard:
             continue
 
         grid[p] = "#"
