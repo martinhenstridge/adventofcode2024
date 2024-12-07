@@ -19,12 +19,16 @@ def concat(a: int, b: int) -> int:
 def is_possible(
     target: int, values: list[int], operators: tuple[Callable[[int, int], int], ...]
 ) -> bool:
-    results: set[int] = set(values[:1])
+    results: list[int] = values[:1]
 
     for v in values[1:]:
-        results = set(
-            op(r, v) for op in operators for r in results if op(r, v) <= target
-        )
+        updated: list[int] = []
+        for op in operators:
+            for r in results:
+                new = op(r, v)
+                if new <= target:
+                    updated.append(new)
+        results = updated
 
     return target in results
 
