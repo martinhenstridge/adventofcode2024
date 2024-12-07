@@ -9,19 +9,22 @@ def extract_calibrations(data: str) -> Iterator[tuple[int, list[int]]]:
 
 
 def concat(a: int, b: int) -> int:
-    return int(str(a) + str(b))
+    digits = b
+    while digits:
+        digits //= 10
+        a *= 10
+    return a + b
 
 
-def analyse(
-    target: int, values: list[int], ops: tuple[Callable[[int, int], int], ...]
+def is_possible(
+    target: int, values: list[int], operators: tuple[Callable[[int, int], int], ...]
 ) -> bool:
     results: set[int] = set(values[:1])
 
-    for value in values[1:]:
-        updated = set()
-        for op in ops:
-            updated |= set(op(r, value) for r in results)
-        results = updated
+    for v in values[1:]:
+        results = set(
+            op(r, v) for op in operators for r in results if op(r, v) <= target
+        )
 
     return target in results
 
@@ -30,11 +33,11 @@ def run(data: str) -> None:
     total1 = 0
     total2 = 0
 
-    for result, values in extract_calibrations(data):
-        if analyse(result, values, ops=(operator.add, operator.mul)):
-            total1 += result
-        if analyse(result, values, ops=(operator.add, operator.mul, concat)):
-            total2 += result
+    for target, values in extract_calibrations(data):
+        if is_possible(target, values, operators=(operator.add, operator.mul)):
+            total1 += target
+        if is_possible(target, values, operators=(operator.add, operator.mul, concat)):
+            total2 += target
 
     print(total1)
     print(total2)
