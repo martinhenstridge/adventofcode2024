@@ -24,15 +24,28 @@ def parse_blocks_free(data: str) -> tuple[list[int], list[tuple[int, int]]]:
     return blocks, free
 
 
-def parse_files_free(
-    data: str,
-) -> tuple[dict[int, tuple[int, int]], dict[int, tuple[int, int]]]:
-    files: dict[int, tuple[int, int]] = {}
-    free: dict[int, tuple[int, int]] = {}
+class FreeNode:
+    __slots__ = ("start", "length", "prev", "next")
+
+    start: int
+    length: int
+    prev: "FreeNode | None"
+    next: "FreeNode | None"
+
+    def __init__(self, start: int, length: int) -> None:
+        self.start = start
+        self.length = length
+        self.prev = None
+        self.next = None
+
+
+def parse_files_free(data: str) -> tuple[list[tuple[int, int, int]], FreeNode]:
+    filelist: list[tuple[int, int, int]] = []
+    freehead: FreeNode | None = None
+    freetail: FreeNode | None = None
 
     index = 0
-    filenum = 0
-    freenum = 0
+    file_id = 0
     occupied = False
 
     for lenstr in data.strip():
@@ -42,16 +55,22 @@ def parse_files_free(
         if length == 0:
             continue
 
-        info = (index, length)
         if occupied:
-            files[filenum] = info
-            filenum += 1
+            filelist.append((file_id, index, length))
+            file_id += 1
         else:
-            free[freenum] = info
-            freenum += 1
+            node = FreeNode(index, length)
+            if freehead is None:
+                freehead = node
+            elif freetail is not None:
+                node.prev = freetail
+                freetail.next = node
+            freetail = node
+
         index += length
 
-    return files, free
+    assert freehead is not None
+    return filelist, freehead
 
 
 def compact1(data: str) -> int:
@@ -77,28 +96,37 @@ def compact1(data: str) -> int:
 
 
 def compact2(data: str) -> int:
-    files, free = parse_files_free(data)
+    filelist, freelist = parse_files_free(data)
+    checksum = 0
 
-    for filenum in reversed(files):
-        file_start, file_length = files[filenum]
-        for freenum, (free_start, free_length) in free.items():
+    for file_id, file_start, file_length in filelist[::-1]:
+        free: "FreeNode | None" = freelist
+        while free is not None:
             # Free space not big enough
-            if free_length < file_length:
+            if free.length < file_length:
+                free = free.next
                 continue
 
             # Free space not to left of file
-            if free_start > file_start:
+            if free.start > file_start:
+                free = free.next
                 continue
 
-            # File will fit, move it
-            files[filenum] = (free_start, file_length)
-            free[freenum] = (free_start + file_length, free_length - file_length)
+            # File will fit, move it and shrink the free space
+            file_start = free.start
+            free.start += file_length
+            free.length -= file_length
+
+            # Unlink the free space from the list if now empty
+            if free.length == 0:
+                if free.prev is not None:
+                    free.prev.next = free.next
+                if free.next is not None:
+                    free.next.prev = free.prev
             break
 
-    checksum = 0
-    for filenum, (start, length) in files.items():
-        for i in range(length):
-            checksum += filenum * (start + i)
+        checksum += file_id * file_length * (2 * file_start + file_length - 1) // 2
+
     return checksum
 
 
