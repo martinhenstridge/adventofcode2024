@@ -4,7 +4,7 @@ from collections.abc import Iterator, Mapping
 
 def parse_grid(data: str) -> Mapping[complex, int]:
     return {
-        complex(r, c): int(char) if char.isdigit() else -1
+        complex(r, c): int(char)
         for r, row in enumerate(data.splitlines())
         for c, char in enumerate(row)
     }
