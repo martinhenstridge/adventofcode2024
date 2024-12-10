@@ -1,36 +1,23 @@
-def parse_blocks_free(data: str) -> tuple[list[int], list[tuple[int, int]]]:
-    blocks: list[int] = []
-    free: list[tuple[int, int]] = []
+class File:
+    __slots__ = ("num", "start", "length")
 
-    occupied = False
-    filenum = 0
+    num: int
+    start: int
+    length: int
 
-    for lenstr in data.strip():
-        occupied = not occupied
-
-        length = int(lenstr)
-        if length == 0:
-            continue
-
-        if occupied:
-            for _ in range(length):
-                blocks.append(filenum)
-            filenum += 1
-        else:
-            free.append((len(blocks), length))
-            for _ in range(length):
-                blocks.append(-1)
-
-    return blocks, free
+    def __init__(self, num: int, start: int, length: int) -> None:
+        self.num = num
+        self.start = start
+        self.length = length
 
 
-class FreeNode:
+class Space:
     __slots__ = ("start", "length", "prev", "next")
 
     start: int
     length: int
-    prev: "FreeNode | None"
-    next: "FreeNode | None"
+    prev: "Space | None"
+    next: "Space | None"
 
     def __init__(self, start: int, length: int) -> None:
         self.start = start
@@ -39,100 +26,121 @@ class FreeNode:
         self.next = None
 
 
-def parse_files_free(data: str) -> tuple[list[tuple[int, int, int]], FreeNode]:
-    filelist: list[tuple[int, int, int]] = []
-    freehead: FreeNode | None = None
-    freetail: FreeNode | None = None
+def parse_files_spaces(data: str, include_zero: bool) -> tuple[list[File], Space]:
+    files: list[File] = []
+    head: Space | None = None
+    tail: Space | None = None
 
     index = 0
-    file_id = 0
+    file_num = 0
     occupied = False
 
     for lenstr in data.strip():
         occupied = not occupied
 
         length = int(lenstr)
-        if length == 0:
+        if length == 0 and not include_zero:
             continue
 
         if occupied:
-            filelist.append((file_id, index, length))
-            file_id += 1
+            files.append(File(file_num, index, length))
+            file_num += 1
         else:
-            node = FreeNode(index, length)
-            if freehead is None:
-                freehead = node
-            elif freetail is not None:
-                node.prev = freetail
-                freetail.next = node
-            freetail = node
+            node = Space(index, length)
+            if head is None:
+                head = node
+            elif tail is not None:
+                node.prev = tail
+                tail.next = node
+            tail = node
 
         index += length
 
-    assert freehead is not None
-    return filelist, freehead
+    assert head is not None
+    return files, head
 
 
-def compact1(data: str) -> int:
-    blocks, free = parse_blocks_free(data)
+def fchecksum(num, start, length) -> int:
+    # Gauss sum of arithmetic sequence
+    return num * length * (2 * start + length - 1) // 2
 
-    while free:
-        block = blocks.pop()
 
-        # Handle free space at the end
-        if block == -1:
-            start, length = free.pop()
-            if length > 1:
-                free.append((start, length - 1))
+def compact1(files: list[File], spaces: Space) -> int:
+    checksum = 0
+    occupied = False
+    s: Space | None = spaces
+
+    while files:
+        occupied = not occupied
+
+        # Handling a file in place
+        if occupied:
+            f = files.pop(0)
+            checksum += fchecksum(f.num, f.start, f.length)
             continue
 
-        # Move block into leftmost free space
-        start, length = free.pop(0)
-        blocks[start] = block
-        if length > 1:
-            free.insert(0, (start + 1, length - 1))
+        # Handling an empty space
+        assert s is not None
+        while files and s.length:
+            f = files.pop()
 
-    return sum(i * b for i, b in enumerate(blocks))
+            if f.length <= s.length:
+                # Whole file move
+                checksum += fchecksum(f.num, s.start, f.length)
+                s.start += f.length
+                s.length -= f.length
+            else:
+                # Only partial file move
+                checksum += fchecksum(f.num, s.start, s.length)
+                f.length -= s.length
+                s.length = 0
+                files.append(f)
+
+        s = s.next
+
+    return checksum
 
 
-def compact2(data: str) -> int:
-    filelist, freelist = parse_files_free(data)
+def compact2(files: list[File], spaces: Space) -> int:
     checksum = 0
 
-    for file_id, file_start, file_length in filelist[::-1]:
-        free: "FreeNode | None" = freelist
-        while free is not None:
+    for f in files[::-1]:
+        s: Space | None = spaces
+        while s is not None:
             # Free space not big enough
-            if free.length < file_length:
-                free = free.next
+            if s.length < f.length:
+                s = s.next
                 continue
 
             # Free space not to left of file
-            if free.start > file_start:
-                free = free.next
+            if s.start > f.start:
+                s = s.next
                 continue
 
-            # File will fit, move it and shrink the free space
-            file_start = free.start
-            free.start += file_length
-            free.length -= file_length
+            # File will fit, move it and shrink the s space
+            f.start = s.start
+            s.start += f.length
+            s.length -= f.length
 
             # Unlink the free space from the list if now empty
-            if free.length == 0:
-                if free.prev is not None:
-                    free.prev.next = free.next
-                if free.next is not None:
-                    free.next.prev = free.prev
+            if s.length == 0:
+                if s.prev is not None:
+                    s.prev.next = s.next
+                if s.next is not None:
+                    s.next.prev = s.prev
             break
 
-        checksum += file_id * file_length * (2 * file_start + file_length - 1) // 2
+        checksum += fchecksum(f.num, f.start, f.length)
 
     return checksum
 
 
 def run(data: str) -> None:
-    checksum1 = compact1(data)
-    checksum2 = compact2(data)
+    files, spaces = parse_files_spaces(data, include_zero=True)
+    checksum1 = compact1(files, spaces)
+
+    files, spaces = parse_files_spaces(data, include_zero=False)
+    checksum2 = compact2(files, spaces)
 
     print(checksum1)
     print(checksum2)
