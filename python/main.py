@@ -20,6 +20,7 @@ PROBLEMS = [
     ("inputs/12", "day12"),
     ("inputs/13", "day13"),
     ("inputs/14", "day14"),
+    ("inputs/15", "day15"),
 ]
 
 
