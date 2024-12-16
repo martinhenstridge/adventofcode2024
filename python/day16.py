@@ -93,50 +93,50 @@ def possible_backward_steps(
 def walk_forwards(
     allowed: Container[P], origin: P, target: P
 ) -> tuple[int, dict[tuple[P, V], int]]:
-    result = 0xFFFFFFFF
-    best: defaultdict[tuple[P, V], int] = defaultdict(lambda: 0xFFFFFFFF)
+    target_score = 0xFFFFFFFF
+    scores: defaultdict[tuple[P, V], int] = defaultdict(lambda: 0xFFFFFFFF)
     pending: list[tuple[int, P, V]] = []
 
     p = origin
     v = V(0, +1)
 
-    best[p, v] = 0
+    scores[p, v] = 0
     heapq.heappush(pending, (0, p, v))
 
     while pending:
-        cost, p, v = heapq.heappop(pending)
+        s, p, v = heapq.heappop(pending)
         if p == target:
-            if cost < result:
-                result = cost
+            if s < target_score:
+                target_score = s
             continue
 
-        for next_p, next_v, step_cost in possible_forward_steps(allowed, p, v):
-            cost = best[p, v] + step_cost
-            if cost < best[next_p, next_v]:
-                best[next_p, next_v] = cost
-                heapq.heappush(pending, (cost, next_p, next_v))
+        for next_p, next_v, step_score in possible_forward_steps(allowed, p, v):
+            next_score = scores[p, v] + step_score
+            if next_score < scores[next_p, next_v]:
+                scores[next_p, next_v] = next_score
+                heapq.heappush(pending, (next_score, next_p, next_v))
 
-    return result, best
+    return target_score, scores
 
 
 def walk_backwards(
-    scores: Mapping[tuple[P, V], int], best: int, origin: P, target: P
+    scores: Mapping[tuple[P, V], int], best_score: int, origin: P, target: P
 ) -> int:
     visited: set[P] = set()
     pending: set[tuple[P, V, int]] = {
-        (p, v, c) for (p, v), c in scores.items() if p == target and c == best
+        (p, v, s) for (p, v), s in scores.items() if p == target and s == best_score
     }
 
     while pending:
-        p, v, c = pending.pop()
+        p, v, s = pending.pop()
         visited.add(p)
         if p == origin:
             continue
 
-        for prev_p, prev_v, step_cost in possible_backward_steps(scores, p, v):
-            cost = c - step_cost
-            if scores[prev_p, prev_v] == cost:
-                pending.add((prev_p, prev_v, cost))
+        for prev_p, prev_v, step_score in possible_backward_steps(scores, p, v):
+            prev_score = s - step_score
+            if scores[prev_p, prev_v] == prev_score:
+                pending.add((prev_p, prev_v, prev_score))
 
     return len(visited)
 
