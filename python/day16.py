@@ -31,6 +31,12 @@ class RowCol:
         assert isinstance(other, RowCol)
         return RowCol(self.r - other.r, self.c - other.c)
 
+    def rotated_clockwise(self) -> "RowCol":
+        return RowCol(-self.c, self.r)
+
+    def rotated_anticlockwise(self) -> "RowCol":
+        return RowCol(self.c, -self.r)
+
 
 P = RowCol
 V = RowCol
@@ -65,11 +71,11 @@ def possible_forward_steps(
     if p1 in allowed:
         yield p1, v0, 1
 
-    v1 = V(v0.c, -v0.r)
+    v1 = v0.rotated_clockwise()
     if p0 + v1 in allowed:
         yield p0, v1, 1000
 
-    v1 = V(-v0.c, v0.r)
+    v1 = v0.rotated_anticlockwise()
     if p0 + v1 in allowed:
         yield p0, v1, 1000
 
@@ -81,11 +87,11 @@ def possible_backward_steps(
     if (p1, v0) in history:
         yield p1, v0, 1
 
-    v1 = V(v0.c, -v0.r)
+    v1 = v0.rotated_clockwise()
     if (p0, v1) in history:
         yield p0, v1, 1000
 
-    v1 = V(-v0.c, v0.r)
+    v1 = v0.rotated_anticlockwise()
     if (p0, v1) in history:
         yield p0, v1, 1000
 
