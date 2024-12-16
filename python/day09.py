@@ -60,7 +60,7 @@ def parse_files_spaces(data: str, include_zero: bool) -> tuple[list[File], Space
     return files, head
 
 
-def fchecksum(num, start, length) -> int:
+def fchecksum(num: int, start: int, length: int) -> int:
     # Gauss sum of arithmetic sequence
     return num * length * (2 * start + length - 1) // 2
 
