@@ -47,7 +47,7 @@ def calculate_safety_factor(ps: list[Pair], xlim: int, ylim: int) -> int:
 
 
 def display(ps: list[Pair], xlim: int, ylim: int, steps: int) -> None:
-    grid = [["." for x in range(xlim)] for y in range(ylim)]
+    grid = [["." for _ in range(xlim)] for _ in range(ylim)]
     for px, py in ps:
         grid[py][px] = "#"
     for row in grid:
