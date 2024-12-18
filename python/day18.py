@@ -47,17 +47,17 @@ class MemorySpace:
         y, x = divmod(p, self.size)
         return (self.size - 1 - x) + (self.size - 1 - y)
 
-    def find_shortest_path(self) -> int:
+    def find_shortest_path(self) -> list[int]:
         best = {p: 0xFFFFFFFF for p in self.space}
         best[self.origin] = 0
 
-        pending: list[tuple[int, int]] = []
-        heapq.heappush(pending, (0, self.origin))
+        pending: list[tuple[int, int, list[int]]] = []
+        heapq.heappush(pending, (0, self.origin, [self.origin]))
 
         while pending:
-            _, p = heapq.heappop(pending)
+            _, p, path = heapq.heappop(pending)
             if p == self.target:
-                break
+                return path
 
             pcost = best[p]
             for n in self.neighbours(p):
@@ -65,9 +65,9 @@ class MemorySpace:
                 if ncost < best[n]:
                     best[n] = ncost
                     priority = ncost + self.manhattan(n)
-                    heapq.heappush(pending, (priority, n))
+                    heapq.heappush(pending, (priority, n, [*path, n]))
 
-        return best[self.target]
+        return []
 
 
 def run(data: str) -> None:
@@ -75,14 +75,15 @@ def run(data: str) -> None:
 
     for _ in range(1024):
         _ = memory_space.corrupt_next_byte()
-    steps1 = memory_space.find_shortest_path()
+    path = memory_space.find_shortest_path()
+    part1 = len(path) - 1
 
-    while True:
+    while path:
         p = memory_space.corrupt_next_byte()
-        if memory_space.find_shortest_path() == 0xFFFFFFFF:
-            y, x = divmod(p, memory_space.size)
-            coords = f"{x},{y}"
-            break
+        if p in path:
+            path = memory_space.find_shortest_path()
+    y, x = divmod(p, memory_space.size)
+    part2 = f"{x},{y}"
 
-    print(steps1)
-    print(coords)
+    print(part1)
+    print(part2)
