@@ -5,7 +5,6 @@ import time
 
 
 PROBLEMS = [
-    ("inputs/00", "day00"),
     ("inputs/01", "day01"),
     ("inputs/02", "day02"),
     ("inputs/03", "day03"),
@@ -23,13 +22,14 @@ PROBLEMS = [
     ("inputs/15", "day15"),
     ("inputs/16", "day16"),
     ("inputs/17", "day17"),
+    ("inputs/18", "day18"),
 ]
 
 
 days_to_run = {int(arg) for arg in sys.argv[1:]}
 
 
-for day, (input_path, solver_module) in enumerate(PROBLEMS[1:], 1):
+for day, (input_path, solver_module) in enumerate(PROBLEMS, 1):
     if days_to_run and day not in days_to_run:
         continue
 
