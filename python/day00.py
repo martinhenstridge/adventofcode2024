@@ -1,3 +1,5 @@
-def run(data: str) -> None:
-    print(None)
-    print(None)
+from typing import Any
+
+
+def run(text: str) -> tuple[Any, Any]:
+    return None, None

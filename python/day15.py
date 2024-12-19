@@ -1,8 +1,11 @@
-def extract_grid_robot(data: str) -> tuple[dict[complex, str], complex]:
+from typing import Any
+
+
+def extract_grid_robot(text: str) -> tuple[dict[complex, str], complex]:
     grid: dict[complex, str] = {}
     robot = complex()
 
-    for r, row in enumerate(data.splitlines()):
+    for r, row in enumerate(text.splitlines()):
         for c, char in enumerate(row):
             p = complex(r, c)
             match char:
@@ -16,10 +19,10 @@ def extract_grid_robot(data: str) -> tuple[dict[complex, str], complex]:
     return grid, robot
 
 
-def extract_moves(data: str) -> list[complex]:
+def extract_moves(text: str) -> list[complex]:
     moves: list[complex] = []
 
-    for char in data:
+    for char in text:
         match char:
             case "^":
                 moves.append(complex(-1, 0))
@@ -129,17 +132,17 @@ def calculate_gps(grid: dict[complex, str]) -> int:
     return total
 
 
-def run(data: str) -> None:
-    grid_input, move_input = data.split("\n\n", maxsplit=1)
-    moves = extract_moves(move_input)
+def run(text: str) -> tuple[Any, Any]:
+    grid_text, move_text = text.split("\n\n", maxsplit=1)
+    moves = extract_moves(move_text)
 
-    grid, robot = extract_grid_robot(grid_input)
+    grid, robot = extract_grid_robot(grid_text)
     for move in moves:
         robot = move_robot(grid, robot, move)
     gps_small = calculate_gps(grid)
 
     grid, robot = extract_grid_robot(
-        grid_input.replace("#", "##")
+        grid_text.replace("#", "##")
         .replace("O", "[]")
         .replace(".", "..")
         .replace("@", "@.")
@@ -148,5 +151,4 @@ def run(data: str) -> None:
         robot = move_robot(grid, robot, move)
     gps_large = calculate_gps(grid)
 
-    print(gps_small)
-    print(gps_large)
+    return gps_small, gps_large

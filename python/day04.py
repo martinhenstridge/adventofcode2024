@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from typing import Any
 
 
 class Grid:
@@ -70,8 +71,8 @@ def x_mas_count(grid: Grid, r: int, c: int) -> int:
     return 1
 
 
-def run(data: str) -> None:
-    grid = Grid(data)
+def run(text: str) -> tuple[Any, Any]:
+    grid = Grid(text)
 
     count1 = 0
     count2 = 0
@@ -80,5 +81,4 @@ def run(data: str) -> None:
         count1 += xmas_count(grid, r, c)
         count2 += x_mas_count(grid, r, c)
 
-    print(count1)
-    print(count2)
+    return count1, count2

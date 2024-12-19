@@ -1,10 +1,11 @@
 import re
+from typing import Any
 
 
-def extract_registers(data: str) -> tuple[int, int, int]:
-    ma = re.search(r"Register A: (\d+)", data)
-    mb = re.search(r"Register B: (\d+)", data)
-    mc = re.search(r"Register C: (\d+)", data)
+def extract_registers(text: str) -> tuple[int, int, int]:
+    ma = re.search(r"Register A: (\d+)", text)
+    mb = re.search(r"Register B: (\d+)", text)
+    mc = re.search(r"Register C: (\d+)", text)
 
     assert ma is not None
     assert mb is not None
@@ -13,8 +14,8 @@ def extract_registers(data: str) -> tuple[int, int, int]:
     return int(ma[1]), int(mb[1]), int(mc[1])
 
 
-def extract_program(data: str) -> list[int]:
-    mp = re.fullmatch(r"Program: ([\d\,]+)", data.strip())
+def extract_program(text: str) -> list[int]:
+    mp = re.fullmatch(r"Program: ([\d\,]+)", text.strip())
     assert mp is not None
     return [int(i) for i in mp[1].split(",")]
 
@@ -63,7 +64,7 @@ def run_program_slow(program: list[int], a: int, b: int, c: int) -> list[int]:
     return output
 
 
-def run_program(program: list[int], a: int, b: int, c: int) -> list[int]:
+def run_program(a: int, b: int, c: int) -> list[int]:
     output: list[int] = []
 
     while a:
@@ -84,7 +85,7 @@ def search(program: list[int], a: int, b: int, c: int, matched: int = 0) -> int 
 
     a <<= 3
     for _ in range(8):
-        output = run_program(program, a, b, c)
+        output = run_program(a, b, c)
         if output == program[-len(output) :]:
             ret = search(program, a, b, c, matched + 1)
             if ret is not None:
@@ -94,16 +95,15 @@ def search(program: list[int], a: int, b: int, c: int, matched: int = 0) -> int 
     return None
 
 
-def run(data: str) -> None:
-    register_input, program_input = data.split("\n\n")
+def run(text: str) -> tuple[Any, Any]:
+    register_text, program_text = text.split("\n\n")
 
-    program = extract_program(program_input)
-    a, b, c = extract_registers(register_input)
+    program = extract_program(program_text)
+    a, b, c = extract_registers(register_text)
 
-    output = run_program(program, a, b, c)
+    output = run_program(a, b, c)
     string = ",".join(str(n) for n in output)
 
     quine = search(program, 0, b, c)
 
-    print(string)
-    print(quine)
+    return string, quine

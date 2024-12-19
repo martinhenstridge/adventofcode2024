@@ -42,12 +42,12 @@ P = RowCol
 V = RowCol
 
 
-def parse_map(data: str) -> tuple[set[P], P, P]:
+def parse_map(text: str) -> tuple[set[P], P, P]:
     allowed: set[P] = set()
     origin = P()
     target = P()
 
-    for r, row in enumerate(data.splitlines()):
+    for r, row in enumerate(text.splitlines()):
         for c, char in enumerate(row):
             p = P(r, c)
             match char:
@@ -147,11 +147,10 @@ def walk_backwards(
     return len(visited)
 
 
-def run(data: str) -> None:
-    allowed, origin, target = parse_map(data)
+def run(text: str) -> tuple[Any, Any]:
+    allowed, origin, target = parse_map(text)
 
     best_score, scores = walk_forwards(allowed, origin, target)
     best_tiles = walk_backwards(scores, best_score, origin, target)
 
-    print(best_score)
-    print(best_tiles)
+    return best_score, best_tiles

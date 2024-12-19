@@ -1,9 +1,10 @@
 import operator
-from collections.abc import Iterator, Callable
+from collections.abc import Callable, Iterator
+from typing import Any
 
 
-def extract_calibrations(data: str) -> Iterator[tuple[int, list[int]]]:
-    for line in data.splitlines():
+def extract_calibrations(text: str) -> Iterator[tuple[int, list[int]]]:
+    for line in text.splitlines():
         left, right = line.split(": ")
         yield int(left), [int(v) for v in right.split()]
 
@@ -33,15 +34,14 @@ def is_possible(
     return target in results
 
 
-def run(data: str) -> None:
+def run(text: str) -> tuple[Any, Any]:
     total1 = 0
     total2 = 0
 
-    for target, values in extract_calibrations(data):
+    for target, values in extract_calibrations(text):
         if is_possible(target, values, operators=(operator.add, operator.mul)):
             total1 += target
         if is_possible(target, values, operators=(operator.add, operator.mul, concat)):
             total2 += target
 
-    print(total1)
-    print(total2)
+    return total1, total2

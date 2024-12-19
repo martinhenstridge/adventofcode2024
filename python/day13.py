@@ -1,11 +1,12 @@
 import re
 from collections.abc import Iterator
+from typing import Any
 
 Pair = tuple[int, int]
 
 
-def extract_claw_machines(data: str) -> Iterator[tuple[Pair, Pair, Pair]]:
-    for chunk in data.split("\n\n"):
+def extract_claw_machines(text: str) -> Iterator[tuple[Pair, Pair, Pair]]:
+    for chunk in text.split("\n\n"):
         a = re.search(r"Button A\: X\+(\d+), Y\+(\d+)", chunk)
         b = re.search(r"Button B\: X\+(\d+), Y\+(\d+)", chunk)
         p = re.search(r"Prize\: X\=(\d+), Y\=(\d+)", chunk)
@@ -44,13 +45,12 @@ def tokens(a: Pair, b: Pair, p: Pair) -> int:
     return 0
 
 
-def run(data: str) -> None:
+def run(text: str) -> tuple[Any, Any]:
     total1 = 0
     total2 = 0
 
-    for a, b, p in extract_claw_machines(data):
+    for a, b, p in extract_claw_machines(text):
         total1 += tokens(a, b, p)
         total2 += tokens(a, b, (p[0] + 10000000000000, p[1] + 10000000000000))
 
-    print(total1)
-    print(total2)
+    return total1, total2

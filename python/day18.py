@@ -1,4 +1,5 @@
 import heapq
+from typing import Any
 
 
 class MemorySpace:
@@ -10,7 +11,7 @@ class MemorySpace:
     space: set[int]
     falling: list[int]
 
-    def __init__(self, size: int, data: str) -> None:
+    def __init__(self, size: int, text: str) -> None:
         self.size = size
         self.origin = 0
         self.target = size * size - 1
@@ -18,7 +19,7 @@ class MemorySpace:
         self.space = {x + size * y for x in range(size) for y in range(size)}
 
         self.falling = []
-        for line in reversed(data.splitlines()):
+        for line in reversed(text.splitlines()):
             x, y = line.split(",", maxsplit=1)
             p = int(x) + self.size * int(y)
             self.falling.append(p)
@@ -70,14 +71,15 @@ class MemorySpace:
         return []
 
 
-def run(data: str) -> None:
-    memory_space = MemorySpace(71, data)
+def run(text: str) -> tuple[Any, Any]:
+    memory_space = MemorySpace(71, text)
 
     for _ in range(1024):
         _ = memory_space.corrupt_next_byte()
     path = memory_space.find_shortest_path()
     part1 = len(path) - 1
 
+    p = 0
     while path:
         p = memory_space.corrupt_next_byte()
         if p in path:
@@ -85,5 +87,4 @@ def run(data: str) -> None:
     y, x = divmod(p, memory_space.size)
     part2 = f"{x},{y}"
 
-    print(part1)
-    print(part2)
+    return part1, part2

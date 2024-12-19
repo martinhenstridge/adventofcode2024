@@ -1,13 +1,14 @@
 import re
+from typing import Any
 
 Pair = tuple[int, int]
 
 
-def extract_robots(data: str) -> tuple[list[Pair], list[Pair]]:
+def extract_robots(text: str) -> tuple[list[Pair], list[Pair]]:
     ps: list[Pair] = []
     vs: list[Pair] = []
 
-    for line in data.splitlines():
+    for line in text.splitlines():
         match = re.fullmatch(r"p=(\d+),(\d+) v=(\-?\d+),(\-?\d+)", line)
         assert match is not None
         ps.append((int(match[1]), int(match[2])))
@@ -64,11 +65,11 @@ def find_coincidence(a_first: int, a_period: int, b_first: int, b_period: int) -
     return t
 
 
-def run(data: str) -> None:
+def run(text: str) -> tuple[Any, Any]:
     xlim = 101
     ylim = 103
 
-    p0, vs = extract_robots(data)
+    p0, vs = extract_robots(text)
     p100 = move_robots(p0, vs, xlim, ylim, steps=100)
     safety_factor = calculate_safety_factor(p100, xlim, ylim)
 
@@ -86,5 +87,4 @@ def run(data: str) -> None:
     # also part of the second sequence.
     tree_appearance = find_coincidence(72, 103, 93, 101)
 
-    print(safety_factor)
-    print(tree_appearance)
+    return safety_factor, tree_appearance

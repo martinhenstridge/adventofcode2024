@@ -1,11 +1,12 @@
 from collections import defaultdict
+from typing import Any
 
 
-def extract_lists(data: str) -> tuple[list[int], list[int]]:
+def extract_lists(text: str) -> tuple[list[int], list[int]]:
     l1: list[int] = []
     l2: list[int] = []
 
-    for line in data.splitlines():
+    for line in text.splitlines():
         v1, v2 = line.split(maxsplit=1)
         l1.append(int(v1))
         l2.append(int(v2))
@@ -13,8 +14,8 @@ def extract_lists(data: str) -> tuple[list[int], list[int]]:
     return l1, l2
 
 
-def run(data: str) -> None:
-    l1, l2 = extract_lists(data)
+def run(text: str) -> tuple[Any, Any]:
+    l1, l2 = extract_lists(text)
 
     l1.sort()
     l2.sort()
@@ -25,5 +26,4 @@ def run(data: str) -> None:
         similarities[n] += n
     similarity_score = sum(similarities[n] for n in l1)
 
-    print(total_distance)
-    print(similarity_score)
+    return total_distance, similarity_score

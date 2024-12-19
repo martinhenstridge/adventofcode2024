@@ -1,13 +1,15 @@
+from typing import Any
+
 Position = complex
 Heading = complex
 Grid = dict[Position, str]
 
 
-def parse_map(data: str) -> tuple[Position, Grid]:
+def parse_map(text: str) -> tuple[Position, Grid]:
     guard = Position()
     grid = Grid()
 
-    for r, row in enumerate(data.splitlines()):
+    for r, row in enumerate(text.splitlines()):
         for c, char in enumerate(row):
             p = Position(r, c)
             grid[p] = char
@@ -37,8 +39,6 @@ def find_visited(guard: Position, grid: Grid) -> set[Position]:
         else:
             guard = candidate
 
-    assert False
-
 
 def is_loop(guard: Position, grid: Grid) -> bool:
     history: set[tuple[Position, Heading]] = set()
@@ -59,11 +59,9 @@ def is_loop(guard: Position, grid: Grid) -> bool:
         else:
             guard = candidate
 
-    assert False
 
-
-def run(data: str) -> None:
-    guard, grid = parse_map(data)
+def run(text: str) -> tuple[Any, Any]:
+    guard, grid = parse_map(text)
 
     visited = find_visited(guard, grid)
 
@@ -77,5 +75,4 @@ def run(data: str) -> None:
             loops += 1
         grid[p] = "."
 
-    print(len(visited))
-    print(loops)
+    return len(visited), loops

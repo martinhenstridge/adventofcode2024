@@ -3,27 +3,7 @@ import pathlib
 import sys
 import time
 
-PROBLEMS = [
-    ("inputs/01", "day01"),
-    ("inputs/02", "day02"),
-    ("inputs/03", "day03"),
-    ("inputs/04", "day04"),
-    ("inputs/05", "day05"),
-    ("inputs/06", "day06"),
-    ("inputs/07", "day07"),
-    ("inputs/08", "day08"),
-    ("inputs/09", "day09"),
-    ("inputs/10", "day10"),
-    ("inputs/11", "day11"),
-    ("inputs/12", "day12"),
-    ("inputs/13", "day13"),
-    ("inputs/14", "day14"),
-    ("inputs/15", "day15"),
-    ("inputs/16", "day16"),
-    ("inputs/17", "day17"),
-    ("inputs/18", "day18"),
-    ("inputs/19", "day19"),
-]
+PROBLEMS = [(f"inputs/{day:02}", f"day{day:02}") for day in range(1, 20)]
 
 
 days_to_run = {int(arg) for arg in sys.argv[1:]}
@@ -33,13 +13,13 @@ for day, (input_path, solver_module) in enumerate(PROBLEMS, 1):
     if days_to_run and day not in days_to_run:
         continue
 
-    input = pathlib.Path(input_path).read_text()
+    input_text = pathlib.Path(input_path).read_text()
     solver = importlib.import_module(solver_module)
 
-    print(f"Day {day:02}\n======")
     start = time.perf_counter_ns()
-    solver.run(input)
+    solution = solver.run(input_text)
     end = time.perf_counter_ns()
-    duration = (end - start) * 1e-9
-    print(f"======\nt (s) = {duration:.2e}")
-    print()
+
+    print(f"{day:>2}-1 :: {solution[0]}")
+    print(f"{day:>2}-2 :: {solution[1]}")
+    print(f"time :: {round((end - start) / 1000):_} \u03bcs\n")

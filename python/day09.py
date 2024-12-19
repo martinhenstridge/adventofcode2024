@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class File:
     __slots__ = ("num", "start", "length")
 
@@ -26,7 +29,7 @@ class Space:
         self.next = None
 
 
-def parse_files_spaces(data: str, include_zero: bool) -> tuple[list[File], Space]:
+def parse_files_spaces(text: str, include_zero: bool) -> tuple[list[File], Space]:
     files: list[File] = []
     head: Space | None = None
     tail: Space | None = None
@@ -35,7 +38,7 @@ def parse_files_spaces(data: str, include_zero: bool) -> tuple[list[File], Space
     file_num = 0
     occupied = False
 
-    for lenstr in data.strip():
+    for lenstr in text.strip():
         occupied = not occupied
 
         length = int(lenstr)
@@ -135,12 +138,11 @@ def compact2(files: list[File], spaces: Space) -> int:
     return checksum
 
 
-def run(data: str) -> None:
-    files, spaces = parse_files_spaces(data, include_zero=True)
+def run(text: str) -> tuple[Any, Any]:
+    files, spaces = parse_files_spaces(text, include_zero=True)
     checksum1 = compact1(files, spaces)
 
-    files, spaces = parse_files_spaces(data, include_zero=False)
+    files, spaces = parse_files_spaces(text, include_zero=False)
     checksum2 = compact2(files, spaces)
 
-    print(checksum1)
-    print(checksum2)
+    return checksum1, checksum2

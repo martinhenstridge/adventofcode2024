@@ -1,5 +1,6 @@
 import functools
 from collections.abc import Callable
+from typing import Any
 
 CountFn = Callable[[list[str], str], int]
 
@@ -29,11 +30,11 @@ def count_combinations(towels: list[str], target: str) -> int:
     return ways
 
 
-def run(data: str) -> None:
-    towel_input, design_input = data.split("\n\n", maxsplit=1)
+def run(text: str) -> tuple[Any, Any]:
+    towel_text, design_text = text.split("\n\n", maxsplit=1)
 
-    towels = towel_input.split(", ")
-    designs = design_input.splitlines()
+    towels = towel_text.split(", ")
+    designs = design_text.splitlines()
 
     possible = 0
     different = 0
@@ -43,5 +44,4 @@ def run(data: str) -> None:
         if count != 0:
             possible += 1
 
-    print(possible)
-    print(different)
+    return possible, different

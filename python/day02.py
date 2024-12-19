@@ -1,9 +1,10 @@
 import itertools
 from collections.abc import Iterator
+from typing import Any
 
 
-def extract_reports(data: str) -> Iterator[list[int]]:
-    for line in data.splitlines():
+def extract_reports(text: str) -> Iterator[list[int]]:
+    for line in text.splitlines():
         yield [int(p) for p in line.split()]
 
 
@@ -22,11 +23,11 @@ def report_without(original: list[int], index: int) -> list[int]:
     return [level for i, level in enumerate(original) if i != index]
 
 
-def run(data: str) -> None:
+def run(text: str) -> tuple[Any, Any]:
     safe_count_naive = 0
     safe_count_damped = 0
 
-    for report in extract_reports(data):
+    for report in extract_reports(text):
         index = find_unsafe_index(report)
         if index is None:
             safe_count_naive += 1
@@ -38,5 +39,4 @@ def run(data: str) -> None:
         ):
             safe_count_damped += 1
 
-    print(safe_count_naive)
-    print(safe_count_damped)
+    return safe_count_naive, safe_count_damped

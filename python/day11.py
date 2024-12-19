@@ -1,8 +1,9 @@
 import functools
+from typing import Any
 
 
-def extract_stones(data: str) -> list[int]:
-    return [int(n) for n in data.split()]
+def extract_stones(text: str) -> list[int]:
+    return [int(n) for n in text.split()]
 
 
 def evolve_once(stone: int) -> list[int]:
@@ -25,11 +26,10 @@ def evolve(stone: int, generations: int) -> int:
     return sum(evolve(st, generations - 1) for st in evolve_once(stone))
 
 
-def run(data: str) -> None:
-    stones = extract_stones(data)
+def run(text: str) -> tuple[Any, Any]:
+    stones = extract_stones(text)
 
     count1 = sum(evolve(st, generations=25) for st in stones)
     count2 = sum(evolve(st, generations=75) for st in stones)
 
-    print(count1)
-    print(count2)
+    return count1, count2

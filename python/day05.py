@@ -15,27 +15,27 @@ class Page:
         return (self.n, other.n) in self.rules
 
 
-def extract_rules(data: str) -> set[tuple[int, int]]:
+def extract_rules(text: str) -> set[tuple[int, int]]:
     rules = set()
-    for line in data.splitlines():
+    for line in text.splitlines():
         n1, n2 = line.split("|", maxsplit=1)
         rule = int(n1), int(n2)
         rules.add(rule)
     return rules
 
 
-def extract_pages(data: str, rules: set[tuple[int, int]]) -> Iterator[list[Page]]:
-    for line in data.splitlines():
+def extract_pages(text: str, rules: set[tuple[int, int]]) -> Iterator[list[Page]]:
+    for line in text.splitlines():
         yield [Page(n, rules) for n in line.split(",")]
 
 
-def run(data: str) -> None:
-    rule_data, page_data = data.split("\n\n", maxsplit=1)
-    rules = extract_rules(rule_data)
+def run(text: str) -> tuple[Any, Any]:
+    rule_text, page_text = text.split("\n\n", maxsplit=1)
+    rules = extract_rules(rule_text)
 
     sum1 = 0
     sum2 = 0
-    for pages in extract_pages(page_data, rules):
+    for pages in extract_pages(page_text, rules):
         middle = len(pages) // 2
         ordered = sorted(pages)
         if ordered == pages:
@@ -43,5 +43,4 @@ def run(data: str) -> None:
         else:
             sum2 += ordered[middle].n
 
-    print(sum1)
-    print(sum2)
+    return sum1, sum2

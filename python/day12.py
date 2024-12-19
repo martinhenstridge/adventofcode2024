@@ -1,11 +1,12 @@
 import itertools
 from collections import defaultdict
 from collections.abc import Iterator, Mapping
+from typing import Any
 
 
-def extract_plots(data: str) -> Mapping[complex, str]:
+def extract_plots(text: str) -> Mapping[complex, str]:
     plots: dict[complex, str] = {}
-    for r, row in enumerate(data.splitlines()):
+    for r, row in enumerate(text.splitlines()):
         for c, char in enumerate(row):
             plots[complex(r, c)] = char
     return plots
@@ -62,8 +63,8 @@ def find_regions(plots: Mapping[complex, str]) -> Iterator[set[complex]]:
         yield region
 
 
-def run(data: str) -> None:
-    plots = extract_plots(data)
+def run(text: str) -> tuple[Any, Any]:
+    plots = extract_plots(text)
 
     total1 = 0
     total2 = 0
@@ -83,5 +84,4 @@ def run(data: str) -> None:
         total1 += area * perimeter
         total2 += area * sides
 
-    print(total1)
-    print(total2)
+    return total1, total2

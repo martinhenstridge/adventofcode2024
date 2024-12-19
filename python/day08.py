@@ -1,14 +1,14 @@
 import itertools
 import math
-
 from collections import defaultdict
 from collections.abc import Mapping
+from typing import Any
 
 
-def parse_grid(data: str) -> tuple[int, Mapping[str, list[complex]]]:
+def parse_grid(text: str) -> tuple[int, Mapping[str, list[complex]]]:
     antennas: defaultdict[str, list[complex]] = defaultdict(list)
 
-    lines = data.splitlines()
+    lines = text.splitlines()
     for r, row in enumerate(lines):
         for c, char in enumerate(row):
             if char == ".":
@@ -60,8 +60,8 @@ def find_antinodes_harmonic(size: int, antennas: list[complex]) -> set[complex]:
     return antinodes
 
 
-def run(data: str) -> None:
-    size, antennas = parse_grid(data)
+def run(text: str) -> tuple[Any, Any]:
+    size, antennas = parse_grid(text)
 
     antinodes1: set[complex] = set()
     for positions in antennas.values():
@@ -71,5 +71,4 @@ def run(data: str) -> None:
     for positions in antennas.values():
         antinodes2 |= find_antinodes_harmonic(size, positions)
 
-    print(len(antinodes1))
-    print(len(antinodes2))
+    return len(antinodes1), len(antinodes2)

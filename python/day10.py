@@ -1,11 +1,12 @@
 from collections import defaultdict
 from collections.abc import Iterator, Mapping
+from typing import Any
 
 
-def parse_grid(data: str) -> Mapping[complex, int]:
+def parse_grid(text: str) -> Mapping[complex, int]:
     return {
         complex(r, c): int(char)
-        for r, row in enumerate(data.splitlines())
+        for r, row in enumerate(text.splitlines())
         for c, char in enumerate(row)
     }
 
@@ -37,8 +38,8 @@ def find_reachable(grid: Mapping[complex, int], p0: complex) -> Mapping[complex,
     return trails
 
 
-def run(data: str) -> None:
-    grid = parse_grid(data)
+def run(text: str) -> tuple[Any, Any]:
+    grid = parse_grid(text)
 
     total1 = 0
     total2 = 0
@@ -49,5 +50,4 @@ def run(data: str) -> None:
             total1 += len(reachable)
             total2 += sum(reachable.values())
 
-    print(total1)
-    print(total2)
+    return total1, total2
