@@ -3,7 +3,6 @@ import pathlib
 import sys
 import time
 
-
 PROBLEMS = [
     ("inputs/01", "day01"),
     ("inputs/02", "day02"),
@@ -23,6 +22,7 @@ PROBLEMS = [
     ("inputs/16", "day16"),
     ("inputs/17", "day17"),
     ("inputs/18", "day18"),
+    ("inputs/19", "day19"),
 ]
 
 
