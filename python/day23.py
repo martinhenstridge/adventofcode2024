@@ -27,7 +27,7 @@ def find_trios(computers: dict[str, set[str]]) -> set[frozenset[str]]:
 
 
 def find_groups(computers: dict[str, set[str]]) -> list[set[str]]:
-    groups = [{a, b} for a, bs in computers.items() for b in bs]
+    groups = [{c} for c in computers]
 
     for candidate, connections in computers.items():
         for group in groups:
