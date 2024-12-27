@@ -1,3 +1,5 @@
+import functools
+import multiprocessing
 from typing import Any
 
 Position = complex
@@ -40,7 +42,7 @@ def find_visited(guard: Position, grid: Grid) -> set[Position]:
             guard = candidate
 
 
-def is_loop(guard: Position, grid: Grid) -> bool:
+def is_loop(grid: Grid, guard: Position, extra: Position) -> bool:
     history: set[tuple[Position, Heading]] = set()
     heading = Heading(-1, 0)
 
@@ -50,7 +52,7 @@ def is_loop(guard: Position, grid: Grid) -> bool:
         if candidate not in grid:
             return False
 
-        if grid[candidate] == "#":
+        if grid[candidate] == "#" or candidate == extra:
             state = (guard, heading)
             if state in history:
                 return True
@@ -65,14 +67,10 @@ def run(text: str) -> tuple[Any, Any]:
 
     visited = find_visited(guard, grid)
 
-    loops = 0
-    for p in visited:
-        if p == guard:
-            continue
+    with multiprocessing.Pool() as pool:
+        loop_checks = pool.map(
+            functools.partial(is_loop, grid, guard),
+            visited - {guard},
+        )
 
-        grid[p] = "#"
-        if is_loop(guard, grid):
-            loops += 1
-        grid[p] = "."
-
-    return len(visited), loops
+    return len(visited), loop_checks.count(True)
