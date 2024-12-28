@@ -1,5 +1,5 @@
-from typing import Any
 from collections import defaultdict
+from typing import Any
 
 
 def parse_computers(text: str) -> dict[str, set[str]]:

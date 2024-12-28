@@ -2,7 +2,6 @@ import operator
 import re
 from typing import Any
 
-
 OPS = {
     "AND": operator.and_,
     "OR": operator.or_,
