@@ -1,148 +1,87 @@
 from typing import Any
 
 
-class File:
-    __slots__ = ("num", "start", "length")
-
-    num: int
-    start: int
-    length: int
-
-    def __init__(self, num: int, start: int, length: int) -> None:
-        self.num = num
-        self.start = start
-        self.length = length
-
-
-class Space:
-    __slots__ = ("start", "length", "prev", "next")
-
-    start: int
-    length: int
-    prev: "Space | None"
-    next: "Space | None"
-
-    def __init__(self, start: int, length: int) -> None:
-        self.start = start
-        self.length = length
-        self.prev = None
-        self.next = None
-
-
-def parse_files_spaces(text: str, include_zero: bool) -> tuple[list[File], Space]:
-    files: list[File] = []
-    head: Space | None = None
-    tail: Space | None = None
-
-    index = 0
-    file_num = 0
-    occupied = False
-
-    for lenstr in text.strip():
-        occupied = not occupied
-
-        length = int(lenstr)
-        if length == 0 and not include_zero:
-            continue
-
-        if occupied:
-            files.append(File(file_num, index, length))
-            file_num += 1
-        else:
-            node = Space(index, length)
-            if head is None:
-                head = node
-            elif tail is not None:
-                node.prev = tail
-                tail.next = node
-            tail = node
-
-        index += length
-
-    assert head is not None
-    return files, head
-
-
-def fchecksum(num: int, start: int, length: int) -> int:
+def fchecksum(file_id: int, start: int, length: int) -> int:
     # Gauss sum of arithmetic sequence
-    return num * length * (2 * start + length - 1) // 2
+    return file_id * length * (2 * start + length - 1) // 2
 
 
-def compact1(files: list[File], spaces: Space) -> int:
+def compact1(original: list[int]) -> int:
+    disk = original.copy()
+
+    target = len(disk) - 1
+    written = 0
+
     checksum = 0
-    occupied = False
-    s: Space | None = spaces
-
-    while files:
-        occupied = not occupied
-
-        # Handling a file in place
-        if occupied:
-            f = files.pop(0)
-            checksum += fchecksum(f.num, f.start, f.length)
+    for idx in range(len(disk)):
+        length = disk[idx]
+        if length == 0:
             continue
 
-        # Handling an empty space
-        assert s is not None
-        while files and s.length:
-            f = files.pop()
+        # Handle file
+        if idx % 2 == 0:
+            checksum += fchecksum(idx // 2, written, length)
+            written += length
+            continue
 
-            if f.length <= s.length:
+        # Handle space
+        while length > 0:
+            file_length = disk[target]
+            if file_length <= length:
                 # Whole file move
-                checksum += fchecksum(f.num, s.start, f.length)
-                s.start += f.length
-                s.length -= f.length
-            else:
-                # Only partial file move
-                checksum += fchecksum(f.num, s.start, s.length)
-                f.length -= s.length
-                s.length = 0
-                files.append(f)
+                checksum += fchecksum(target // 2, written, file_length)
+                written += file_length
 
-        s = s.next
+                disk[target] = 0
+                length -= file_length
+                target -= 2
+                disk[target + 1] = 0
+            else:
+                # Partial file move
+                checksum += fchecksum(target // 2, written, length)
+                written += length
+
+                disk[target] -= length
+                length = 0
 
     return checksum
 
 
-def compact2(files: list[File], spaces: Space) -> int:
+def compact2(original: list[int]) -> int:
+    disk = original.copy()
+
+    starts = []
+    start = 0
+    for length in disk:
+        starts.append(start)
+        start += length
+
     checksum = 0
+    for file in range(len(disk) - 1, -1, -2):
+        file_length = disk[file]
+        if file_length == 0:
+            continue
 
-    for f in files[::-1]:
-        s: Space | None = spaces
-        while s is not None:
-            # Free space not big enough
-            if s.length < f.length:
-                s = s.next
+        start = starts[file]
+        for space in range(1, file, 2):
+            space_length = disk[space]
+            if space_length < file_length:
                 continue
 
-            # Free space not to left of file
-            if s.start > f.start:
-                s = s.next
-                continue
-
-            # File will fit, move it and shrink the s space
-            f.start = s.start
-            s.start += f.length
-            s.length -= f.length
-
-            # Unlink the free space from the list if now empty
-            if s.length == 0:
-                if s.prev is not None:
-                    s.prev.next = s.next
-                if s.next is not None:
-                    s.next.prev = s.prev
+            disk[space] -= file_length
+            start = starts[space]
+            starts[space] += file_length
             break
 
-        checksum += fchecksum(f.num, f.start, f.length)
+        checksum += fchecksum(file // 2, start, file_length)
 
     return checksum
 
 
 def run(text: str) -> tuple[Any, Any]:
-    files, spaces = parse_files_spaces(text, include_zero=True)
-    checksum1 = compact1(files, spaces)
+    disk_map = [int(n) for n in text.strip()]
 
-    files, spaces = parse_files_spaces(text, include_zero=False)
-    checksum2 = compact2(files, spaces)
+    checksum1 = compact1(disk_map)
+    checksum2 = compact2(disk_map)
 
     return checksum1, checksum2
