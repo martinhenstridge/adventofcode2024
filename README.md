@@ -5,7 +5,7 @@
 Run solutions as follows:
 
 ```
-python3 python/main.py [DAY]...
+uv run python/main.py [DAY]...
 ```
 
 ## Zig

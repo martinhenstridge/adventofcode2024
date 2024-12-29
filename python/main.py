@@ -3,6 +3,11 @@ import pathlib
 import sys
 import time
 
+MICROSECONDS = "\u03bcs"
+ANSI_ESCAPE = "\u001b"
+ANSI_GREEN = f"{ANSI_ESCAPE}[32m"
+ANSI_RESET = f"{ANSI_ESCAPE}[0m"
+
 
 def run(day: int) -> None:
     solver = importlib.import_module(f"day{day:02}")
@@ -12,9 +17,11 @@ def run(day: int) -> None:
     solution = solver.run(input_text)
     end = time.perf_counter_ns()
 
-    print(f"{day:02} ({round((end - start) / 1000):_} \u03bcs)")
-    print(f":: {solution[0]}")
-    print(f":: {solution[1]}")
+    print(
+        f"{ANSI_GREEN}Day {day:02} ({round((end - start) / 1000):_} {MICROSECONDS}){ANSI_RESET}"
+    )
+    print(solution[0])
+    print(solution[1])
     print()
 
 
