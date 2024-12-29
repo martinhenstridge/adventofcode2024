@@ -1,3 +1,5 @@
+import functools
+import multiprocessing
 import operator
 from collections.abc import Callable, Iterator
 from typing import Any
@@ -18,8 +20,11 @@ def concat(a: int, b: int) -> int:
 
 
 def is_possible(
-    target: int, values: list[int], operators: tuple[Callable[[int, int], int], ...]
-) -> bool:
+    target: int,
+    values: list[int],
+    *,
+    operators: tuple[Callable[[int, int], int], ...],
+) -> int:
     results: list[int] = values[:1]
 
     for v in values[1:]:
@@ -31,17 +36,28 @@ def is_possible(
                     updated.append(new)
         results = updated
 
-    return target in results
+    return target if target in results else 0
 
 
 def run(text: str) -> tuple[Any, Any]:
-    total1 = 0
-    total2 = 0
+    calibrations = list(extract_calibrations(text))
 
-    for target, values in extract_calibrations(text):
-        if is_possible(target, values, operators=(operator.add, operator.mul)):
-            total1 += target
-        if is_possible(target, values, operators=(operator.add, operator.mul, concat)):
-            total2 += target
+    with multiprocessing.Pool() as pool:
+        possibles1 = pool.starmap(
+            functools.partial(
+                is_possible,
+                operators=(operator.add, operator.mul),
+            ),
+            calibrations,
+        )
 
-    return total1, total2
+    with multiprocessing.Pool() as pool:
+        possibles2 = pool.starmap(
+            functools.partial(
+                is_possible,
+                operators=(operator.add, operator.mul, concat),
+            ),
+            calibrations,
+        )
+
+    return sum(possibles1), sum(possibles2)
