@@ -1,3 +1,5 @@
+import functools
+import multiprocessing
 from collections.abc import Container, Iterable, Mapping
 from typing import Any
 
@@ -72,19 +74,21 @@ def find_path(
     return path
 
 
-def find_cheat_savings(
-    path: Mapping[Position, int], threshold: int, moves: Iterable[tuple[int, Position]]
+def count_above_threshold(
+    path: Mapping[Position, int],
+    start: Position,
+    *,
+    cheats: Iterable[tuple[int, Position]],
 ) -> int:
     count = 0
 
-    for p0, t0 in path.items():
-        for cost, move in moves:
-            p = p0 + move
-            if p not in path:
-                continue
-            saving = t0 - path[p] - cost
-            if saving >= threshold:
-                count += 1
+    for cost, move in cheats:
+        p = start + move
+        if p not in path:
+            continue
+        saving = path[start] - path[p] - cost
+        if saving >= 100:
+            count += 1
 
     return count
 
@@ -94,7 +98,14 @@ def run(text: str) -> tuple[Any, Any]:
 
     path = find_path(walls, origin, target)
 
-    count2 = find_cheat_savings(path, threshold=100, moves=cheat_moves(2))
-    count20 = find_cheat_savings(path, threshold=100, moves=cheat_moves(20))
+    with multiprocessing.Pool() as pool:
+        counts2 = pool.map(
+            functools.partial(count_above_threshold, path, cheats=cheat_moves(2)),
+            path,
+        )
+        counts20 = pool.map(
+            functools.partial(count_above_threshold, path, cheats=cheat_moves(20)),
+            path,
+        )
 
-    return count2, count20
+    return sum(counts2), sum(counts20)
