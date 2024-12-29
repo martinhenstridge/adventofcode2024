@@ -1,17 +1,20 @@
 import importlib
-import pathlib
 import sys
 import time
+from pathlib import Path
 
 MICROSECONDS = "\u03bcs"
 ANSI_ESCAPE = "\u001b"
 ANSI_GREEN = f"{ANSI_ESCAPE}[32m"
 ANSI_RESET = f"{ANSI_ESCAPE}[0m"
 
+ROOT = Path(__file__).parents[1]
+
 
 def run(day: int) -> None:
     solver = importlib.import_module(f"day{day:02}")
-    input_text = pathlib.Path(f"inputs/{day:02}").read_text()
+    input_path = ROOT / "inputs" / f"{day:02}"
+    input_text = input_path.read_text()
 
     start = time.perf_counter_ns()
     solution = solver.run(input_text)
