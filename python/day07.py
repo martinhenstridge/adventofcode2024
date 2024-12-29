@@ -50,8 +50,6 @@ def run(text: str) -> tuple[Any, Any]:
             ),
             calibrations,
         )
-
-    with multiprocessing.Pool() as pool:
         possibles2 = pool.starmap(
             functools.partial(
                 is_possible,
